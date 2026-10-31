@@ -167,6 +167,7 @@ QI|dist_ubuntu_de
 | :--- | :--- |
 | `Super + Return` | Open Terminal (`alacritty`) |
 | `Super + Space` or `Super + D` | Open App Launcher (`fuzzel`) |
+| `Ctrl + Shift + Escape` or `Super + Escape` | Open **Dense Task Manager** (`dense-taskmanager`) |
 | `Super + E` | Open File Manager (`thunar`) |
 | `Super + W` | Open Web Browser (`firefox`) |
 | `Super + Q` | Close Active Window |
@@ -174,6 +175,16 @@ QI|dist_ubuntu_de
 | `Super + 1..4` | Switch Workspace 1 through 4 |
 | `Super + L` | Lock Screen |
 | `Super + Shift + Q` | Log Out |
+
+---
+
+## Dense Task Manager Features
+
+The desktop environment includes a dedicated native Task Manager (`dense-taskmanager`):
+- **Processes Tab**: Real-time listing of running processes with PID, Name, User, Memory (MB), and State. Search/filter by process name or PID. Includes **End Process** (`SIGTERM`) and **Kill Force** (`SIGKILL`).
+- **Performance Tab**: Real-time monitoring with graphical progress gauges for CPU usage (%), CPU temperature (°C), Memory (Used/Total/%), Swap usage, Root Disk (Used/Free/Total), System Load Averages, and Uptime.
+- **Instant Access**: Open via `Ctrl+Shift+Escape`, `Super+Escape`, the right-click desktop menu, the application dock, or simply by **clicking the CPU/RAM widget on the top status bar**.
+
 
 ---
 

@@ -31,13 +31,28 @@ elif [ -d "$SCRIPT_DIR/src" ]; then
 fi
 chmod 755 /usr/local/bin/dense 2>/dev/null || true
 
-echo "[4/6] Registering Dense Wayland session entry..."
+echo "[4/6] Registering Dense Wayland session entry & utilities..."
 mkdir -p /usr/share/wayland-sessions
 cp "$SCRIPT_DIR/dense.desktop" /usr/share/wayland-sessions/dense.desktop
 chmod 644 /usr/share/wayland-sessions/dense.desktop
 
 cp "$SCRIPT_DIR/dense-session" /usr/local/bin/dense-session
 chmod 755 /usr/local/bin/dense-session
+
+if [ -f "$SCRIPT_DIR/dense-bar" ]; then
+    cp "$SCRIPT_DIR/dense-bar" /usr/local/bin/dense-bar
+    chmod 755 /usr/local/bin/dense-bar
+fi
+
+if [ -f "$SCRIPT_DIR/dense-taskmanager" ]; then
+    cp "$SCRIPT_DIR/dense-taskmanager" /usr/local/bin/dense-taskmanager
+    chmod 755 /usr/local/bin/dense-taskmanager
+fi
+if [ -f "$SCRIPT_DIR/dense-taskmanager.desktop" ]; then
+    mkdir -p /usr/share/applications
+    cp "$SCRIPT_DIR/dense-taskmanager.desktop" /usr/share/applications/dense-taskmanager.desktop
+    chmod 644 /usr/share/applications/dense-taskmanager.desktop
+fi
 
 echo "[5/6] Deploying Dense desktop environment configurations..."
 mkdir -p /etc/dense

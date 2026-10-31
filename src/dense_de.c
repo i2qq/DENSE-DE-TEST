@@ -1133,12 +1133,25 @@ bool dense_de_export_config(const char *target_dir) {
         fprintf(fp, "fi\n");
         fprintf(fp, "chmod 755 /usr/local/bin/dense 2>/dev/null || true\n\n");
 
-        fprintf(fp, "echo \"[4/6] Registering Dense Wayland session entry...\"\n");
+        fprintf(fp, "echo \"[4/6] Registering Dense Wayland session entry & utilities...\"\n");
         fprintf(fp, "mkdir -p /usr/share/wayland-sessions\n");
         fprintf(fp, "cp \"$SCRIPT_DIR/dense.desktop\" /usr/share/wayland-sessions/dense.desktop\n");
         fprintf(fp, "chmod 644 /usr/share/wayland-sessions/dense.desktop\n\n");
         fprintf(fp, "cp \"$SCRIPT_DIR/dense-session\" /usr/local/bin/dense-session\n");
         fprintf(fp, "chmod 755 /usr/local/bin/dense-session\n\n");
+        fprintf(fp, "if [ -f \"$SCRIPT_DIR/dense-bar\" ]; then\n");
+        fprintf(fp, "    cp \"$SCRIPT_DIR/dense-bar\" /usr/local/bin/dense-bar\n");
+        fprintf(fp, "    chmod 755 /usr/local/bin/dense-bar\n");
+        fprintf(fp, "fi\n\n");
+        fprintf(fp, "if [ -f \"$SCRIPT_DIR/dense-taskmanager\" ]; then\n");
+        fprintf(fp, "    cp \"$SCRIPT_DIR/dense-taskmanager\" /usr/local/bin/dense-taskmanager\n");
+        fprintf(fp, "    chmod 755 /usr/local/bin/dense-taskmanager\n");
+        fprintf(fp, "fi\n");
+        fprintf(fp, "if [ -f \"$SCRIPT_DIR/dense-taskmanager.desktop\" ]; then\n");
+        fprintf(fp, "    mkdir -p /usr/share/applications\n");
+        fprintf(fp, "    cp \"$SCRIPT_DIR/dense-taskmanager.desktop\" /usr/share/applications/dense-taskmanager.desktop\n");
+        fprintf(fp, "    chmod 644 /usr/share/applications/dense-taskmanager.desktop\n");
+        fprintf(fp, "fi\n\n");
 
         fprintf(fp, "echo \"[5/6] Deploying Dense desktop environment configurations...\"\n");
         fprintf(fp, "mkdir -p /etc/dense\n");

@@ -159,6 +159,17 @@ if [ -f "$WORKDIR/dist_ubuntu_de/dense-bar" ]; then
     chmod 755 /usr/local/bin/dense-bar
 fi
 
+# Install Dense Task Manager
+if [ -f "$WORKDIR/dist_ubuntu_de/dense-taskmanager" ]; then
+    cp "$WORKDIR/dist_ubuntu_de/dense-taskmanager" /usr/local/bin/dense-taskmanager
+    chmod 755 /usr/local/bin/dense-taskmanager
+fi
+if [ -f "$WORKDIR/dist_ubuntu_de/dense-taskmanager.desktop" ]; then
+    mkdir -p /usr/share/applications
+    cp "$WORKDIR/dist_ubuntu_de/dense-taskmanager.desktop" /usr/share/applications/dense-taskmanager.desktop
+    chmod 644 /usr/share/applications/dense-taskmanager.desktop
+fi
+
 echo "[5/6] Deploying Dense desktop environment configurations..."
 mkdir -p /etc/dense
 if [ -d "$WORKDIR/dist_ubuntu_de" ]; then

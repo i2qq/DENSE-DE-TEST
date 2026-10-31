@@ -1,0 +1,435 @@
+#!/usr/bin/env python3
+"""
+Dense Task Manager (dense-taskmanager)
+High-performance, lightweight system monitor and process manager for the Dense Desktop Environment.
+"""
+import sys
+import os
+import time
+import subprocess
+import signal
+
+def get_system_stats():
+    # Read memory info
+    mem_total = 0
+    mem_free = 0
+    mem_avail = 0
+    swap_total = 0
+    swap_free = 0
+    try:
+        with open("/proc/meminfo") as f:
+            for line in f:
+                parts = line.split()
+                if len(parts) >= 2:
+                    k, v = parts[0], int(parts[1])
+                    if k == "MemTotal:": mem_total = v
+                    elif k == "MemFree:": mem_free = v
+                    elif k == "MemAvailable:": mem_avail = v
+                    elif k == "SwapTotal:": swap_total = v
+                    elif k == "SwapFree:": swap_free = v
+    except Exception:
+        mem_total = 16384 * 1024
+        mem_avail = 8192 * 1024
+
+    mem_used = mem_total - mem_avail
+    mem_pct = (mem_used / mem_total * 100) if mem_total > 0 else 0
+    swap_used = swap_total - swap_free
+    swap_pct = (swap_used / swap_total * 100) if swap_total > 0 else 0
+
+    # CPU temperature
+    cpu_temp = 0
+    for path in ["/sys/class/thermal/thermal_zone0/temp", "/sys/class/hwmon/hwmon0/temp1_input"]:
+        if os.path.exists(path):
+            try:
+                with open(path) as f:
+                    cpu_temp = int(f.read().strip()) // 1000
+                    break
+            except Exception:
+                pass
+
+    # CPU usage calculation via /proc/stat
+    cpu_pct = 0
+    try:
+        with open("/proc/stat") as f:
+            line = f.readline()
+            if line.startswith("cpu "):
+                fields = [float(x) for x in line.split()[1:]]
+                idle = fields[3]
+                total = sum(fields)
+                if hasattr(get_system_stats, "last_cpu"):
+                    last_idle, last_total = get_system_stats.last_cpu
+                    d_idle = idle - last_idle
+                    d_total = total - last_total
+                    if d_total > 0:
+                        cpu_pct = max(0.0, min(100.0, (1.0 - (d_idle / d_total)) * 100.0))
+                get_system_stats.last_cpu = (idle, total)
+    except Exception:
+        cpu_pct = 5.0
+
+    # Disk usage
+    disk_total_gb = 0
+    disk_free_gb = 0
+    disk_used_gb = 0
+    disk_pct = 0
+    try:
+        st = os.statvfs("/")
+        total_bytes = st.f_blocks * st.f_frsize
+        free_bytes = st.f_bavail * st.f_frsize
+        disk_total_gb = total_bytes // (1024**3)
+        disk_free_gb = free_bytes // (1024**3)
+        disk_used_gb = disk_total_gb - disk_free_gb
+        disk_pct = (disk_used_gb / disk_total_gb * 100) if disk_total_gb > 0 else 0
+    except Exception:
+        pass
+
+    # Uptime & Load
+    uptime_str = ""
+    load_str = ""
+    try:
+        with open("/proc/uptime") as f:
+            up_secs = int(float(f.readline().split()[0]))
+            mins, secs = divmod(up_secs, 60)
+            hours, mins = divmod(mins, 60)
+            uptime_str = f"{hours}h {mins}m {secs}s"
+        loads = os.getloadavg()
+        load_str = f"{loads[0]:.2f}, {loads[1]:.2f}, {loads[2]:.2f}"
+    except Exception:
+        uptime_str = "Unknown"
+        load_str = "0.00, 0.00, 0.00"
+
+    return {
+        "mem_total_mb": mem_total // 1024,
+        "mem_used_mb": mem_used // 1024,
+        "mem_avail_mb": mem_avail // 1024,
+        "mem_pct": mem_pct,
+        "swap_total_mb": swap_total // 1024,
+        "swap_used_mb": swap_used // 1024,
+        "swap_pct": swap_pct,
+        "cpu_temp": cpu_temp,
+        "cpu_pct": cpu_pct,
+        "disk_total_gb": disk_total_gb,
+        "disk_free_gb": disk_free_gb,
+        "disk_used_gb": disk_used_gb,
+        "disk_pct": disk_pct,
+        "uptime": uptime_str,
+        "load": load_str,
+    }
+
+def get_process_list():
+    procs = []
+    # Read /proc entries
+    try:
+        for entry in os.listdir("/proc"):
+            if not entry.isdigit():
+                continue
+            pid = int(entry)
+            pdir = f"/proc/{pid}"
+            try:
+                name = ""
+                state = "R"
+                vm_rss = 0
+                uid = 0
+
+                # Read stat
+                with open(f"{pdir}/stat", "r") as f:
+                    content = f.read()
+                    # Name is enclosed in parentheses
+                    open_paren = content.find("(")
+                    close_paren = content.rfind(")")
+                    if open_paren != -1 and close_paren != -1:
+                        name = content[open_paren + 1:close_paren]
+                        rest = content[close_paren + 2:].split()
+                        state = rest[0]
+
+                # Read status for memory and user
+                if os.path.exists(f"{pdir}/status"):
+                    with open(f"{pdir}/status", "r") as f:
+                        for l in f:
+                            if l.startswith("VmRSS:"):
+                                parts = l.split()
+                                if len(parts) >= 2:
+                                    vm_rss = int(parts[1])
+                            elif l.startswith("Uid:"):
+                                parts = l.split()
+                                if len(parts) >= 2:
+                                    uid = int(parts[1])
+
+                username = "root" if uid == 0 else "user"
+                try:
+                    import pwd
+                    username = pwd.getpwuid(uid).pw_name
+                except Exception:
+                    pass
+
+                mem_mb = vm_rss / 1024.0
+                procs.append({
+                    "pid": pid,
+                    "name": name,
+                    "user": username,
+                    "mem_mb": mem_mb,
+                    "state": state
+                })
+            except Exception:
+                continue
+    except Exception:
+        pass
+
+    procs.sort(key=lambda p: p["mem_mb"], reverse=True)
+    return procs
+
+def run_gui():
+    try:
+        import gi
+        gi.require_version('Gtk', '3.0')
+        from gi.repository import Gtk, GLib, Pango
+
+        win = Gtk.Window()
+        win.set_title("Dense Task Manager")
+        win.set_default_size(780, 520)
+        win.set_position(Gtk.WindowPosition.CENTER)
+
+        # Main notebook
+        notebook = Gtk.Notebook()
+        win.add(notebook)
+
+        # -------------------------------------------------------------
+        # TAB 1: PROCESSES
+        # -------------------------------------------------------------
+        vbox_proc = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
+        vbox_proc.set_margin_start(12)
+        vbox_proc.set_margin_end(12)
+        vbox_proc.set_margin_top(12)
+        vbox_proc.set_margin_bottom(12)
+
+        # Top search & action bar
+        search_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=8)
+        search_entry = Gtk.SearchEntry()
+        search_entry.set_placeholder_text("Filter processes by name or PID...")
+        search_box.pack_start(search_entry, True, True, 0)
+
+        btn_end = Gtk.Button(label=" End Process ")
+        btn_kill = Gtk.Button(label=" Kill Force ")
+        search_box.pack_start(btn_end, False, False, 0)
+        search_box.pack_start(btn_kill, False, False, 0)
+        vbox_proc.pack_start(search_box, False, False, 0)
+
+        # Process TreeView
+        liststore = Gtk.ListStore(int, str, str, str, str)
+        treeview = Gtk.TreeView(model=liststore)
+        treeview.set_rules_hint(True)
+
+        col_titles = ["PID", "Process Name", "User", "Memory (MB)", "State"]
+        for i, col_title in enumerate(col_titles):
+            renderer = Gtk.CellRendererText()
+            col = Gtk.TreeViewColumn(col_title, renderer, text=i)
+            col.set_sort_column_id(i)
+            col.set_resizable(True)
+            if i == 1:
+                col.set_min_width(220)
+            treeview.append_column(col)
+
+        scroll_proc = Gtk.ScrolledWindow()
+        scroll_proc.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
+        scroll_proc.add(treeview)
+        vbox_proc.pack_start(scroll_proc, True, True, 0)
+
+        # Status footer
+        lbl_proc_count = Gtk.Label(label="Processes: 0")
+        lbl_proc_count.set_alignment(0, 0.5)
+        vbox_proc.pack_start(lbl_proc_count, False, False, 0)
+
+        notebook.append_page(vbox_proc, Gtk.Label(label="Processes"))
+
+        # -------------------------------------------------------------
+        # TAB 2: PERFORMANCE & SYSTEM STATS
+        # -------------------------------------------------------------
+        vbox_perf = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=16)
+        vbox_perf.set_margin_start(16)
+        vbox_perf.set_margin_end(16)
+        vbox_perf.set_margin_top(16)
+        vbox_perf.set_margin_bottom(16)
+
+        # CPU Card
+        frame_cpu = Gtk.Frame(label=" CPU Performance ")
+        box_cpu = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
+        box_cpu.set_margin_start(12)
+        box_cpu.set_margin_end(12)
+        box_cpu.set_margin_top(8)
+        box_cpu.set_margin_bottom(8)
+        lbl_cpu_val = Gtk.Label(label="CPU Usage: 0% | Temp: 0°C")
+        lbl_cpu_val.set_alignment(0, 0.5)
+        prog_cpu = Gtk.ProgressBar()
+        prog_cpu.set_show_text(True)
+        box_cpu.pack_start(lbl_cpu_val, False, False, 0)
+        box_cpu.pack_start(prog_cpu, False, False, 0)
+        frame_cpu.add(box_cpu)
+        vbox_perf.pack_start(frame_cpu, False, False, 0)
+
+        # Memory Card
+        frame_mem = Gtk.Frame(label=" Memory & Swap ")
+        box_mem = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
+        box_mem.set_margin_start(12)
+        box_mem.set_margin_end(12)
+        box_mem.set_margin_top(8)
+        box_mem.set_margin_bottom(8)
+        lbl_mem_val = Gtk.Label(label="Memory Usage: 0 MB / 0 MB (0%)")
+        lbl_mem_val.set_alignment(0, 0.5)
+        prog_mem = Gtk.ProgressBar()
+        prog_mem.set_show_text(True)
+        lbl_swap_val = Gtk.Label(label="Swap Usage: 0 MB / 0 MB (0%)")
+        lbl_swap_val.set_alignment(0, 0.5)
+        prog_swap = Gtk.ProgressBar()
+        box_mem.pack_start(lbl_mem_val, False, False, 0)
+        box_mem.pack_start(prog_mem, False, False, 0)
+        box_mem.pack_start(lbl_swap_val, False, False, 0)
+        box_mem.pack_start(prog_swap, False, False, 0)
+        frame_mem.add(box_mem)
+        vbox_perf.pack_start(frame_mem, False, False, 0)
+
+        # Storage & System Card
+        frame_sys = Gtk.Frame(label=" Storage & System Info ")
+        box_sys = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
+        box_sys.set_margin_start(12)
+        box_sys.set_margin_end(12)
+        box_sys.set_margin_top(8)
+        box_sys.set_margin_bottom(8)
+        lbl_disk_val = Gtk.Label(label="Root Storage: 0 GB / 0 GB Free")
+        lbl_disk_val.set_alignment(0, 0.5)
+        prog_disk = Gtk.ProgressBar()
+        lbl_up_val = Gtk.Label(label="Uptime: 0 | Load: 0.00, 0.00, 0.00")
+        lbl_up_val.set_alignment(0, 0.5)
+        box_sys.pack_start(lbl_disk_val, False, False, 0)
+        box_sys.pack_start(prog_disk, False, False, 0)
+        box_sys.pack_start(lbl_up_val, False, False, 0)
+        frame_sys.add(box_sys)
+        vbox_perf.pack_start(frame_sys, False, False, 0)
+
+        notebook.append_page(vbox_perf, Gtk.Label(label="Performance"))
+
+        # -------------------------------------------------------------
+        # LOGIC & REFRESH HANDLERS
+        # -------------------------------------------------------------
+        current_filter = ""
+
+        def refresh_proc_data():
+            procs = get_process_list()
+            liststore.clear()
+            filter_text = current_filter.lower().strip()
+            total_count = 0
+            for p in procs:
+                if filter_text:
+                    if filter_text not in p["name"].lower() and filter_text not in str(p["pid"]):
+                        continue
+                total_count += 1
+                liststore.append([
+                    p["pid"],
+                    p["name"],
+                    p["user"],
+                    f"{p['mem_mb']:.1f}",
+                    p["state"]
+                ])
+            lbl_proc_count.set_text(f"Processes: {total_count} matching (Total: {len(procs)})")
+
+        def refresh_perf_data():
+            stats = get_system_stats()
+            # Update CPU
+            lbl_cpu_val.set_text(f"CPU Usage: {stats['cpu_pct']:.1f}% | Temperature: {stats['cpu_temp']}°C")
+            prog_cpu.set_fraction(max(0.0, min(1.0, stats['cpu_pct'] / 100.0)))
+            prog_cpu.set_text(f"{stats['cpu_pct']:.1f}%")
+
+            # Update Memory
+            lbl_mem_val.set_text(f"Memory: {stats['mem_used_mb']} MB / {stats['mem_total_mb']} MB ({stats['mem_pct']:.1f}%)")
+            prog_mem.set_fraction(max(0.0, min(1.0, stats['mem_pct'] / 100.0)))
+            prog_mem.set_text(f"{stats['mem_pct']:.1f}%")
+
+            # Update Swap
+            lbl_swap_val.set_text(f"Swap: {stats['swap_used_mb']} MB / {stats['swap_total_mb']} MB ({stats['swap_pct']:.1f}%)")
+            prog_swap.set_fraction(max(0.0, min(1.0, stats['swap_pct'] / 100.0)))
+
+            # Update Disk & Uptime
+            lbl_disk_val.set_text(f"Storage (/): {stats['disk_used_gb']} GB used of {stats['disk_total_gb']} GB ({stats['disk_free_gb']} GB Free)")
+            prog_disk.set_fraction(max(0.0, min(1.0, stats['disk_pct'] / 100.0)))
+            lbl_up_val.set_text(f"Uptime: {stats['uptime']} | Load Average: {stats['load']}")
+
+        def on_search_changed(entry):
+            nonlocal current_filter
+            current_filter = entry.get_text()
+            refresh_proc_data()
+
+        search_entry.connect("search-changed", on_search_changed)
+
+        def get_selected_pid():
+            selection = treeview.get_selection()
+            model, treeiter = selection.get_selected()
+            if treeiter:
+                return model[treeiter][0]
+            return None
+
+        def on_end_process(btn):
+            pid = get_selected_pid()
+            if pid:
+                try:
+                    os.kill(pid, signal.SIGTERM)
+                except Exception as e:
+                    print(f"Error terminating PID {pid}: {e}")
+                refresh_proc_data()
+
+        def on_kill_process(btn):
+            pid = get_selected_pid()
+            if pid:
+                try:
+                    os.kill(pid, signal.SIGKILL)
+                except Exception as e:
+                    print(f"Error killing PID {pid}: {e}")
+                refresh_proc_data()
+
+        btn_end.connect("clicked", on_end_process)
+        btn_kill.connect("clicked", on_kill_process)
+
+        # Periodic refresh
+        def periodic_update():
+            refresh_perf_data()
+            refresh_proc_data()
+            return True
+
+        # Initial populate
+        periodic_update()
+        GLIB_TIMER = GLib.timeout_add_seconds(2, periodic_update)
+
+        # Custom styling
+        css_data = b"""
+        window { background-color: #13141f; color: #e2e8f0; }
+        frame { border: 1px solid #282a36; border-radius: 8px; margin: 4px; padding: 6px; }
+        frame > border { border: 1px solid #282a36; border-radius: 8px; }
+        progressbar trough { background-color: #1e1f2e; border-radius: 6px; }
+        progressbar progress { background-color: #6366f1; border-radius: 6px; }
+        treeview { background-color: #181926; color: #e2e8f0; }
+        treeview:selected { background-color: #6366f1; color: #ffffff; }
+        button { background-color: #282a36; color: #e2e8f0; border-radius: 6px; padding: 4px 10px; }
+        button:hover { background-color: #6366f1; color: #ffffff; }
+        entry { background-color: #1e1f2e; color: #e2e8f0; border: 1px solid #363a4f; border-radius: 6px; }
+        """
+        try:
+            css_prov = Gtk.CssProvider()
+            css_prov.load_from_data(css_data)
+            Gtk.StyleContext.add_provider_for_screen(
+                win.get_screen(), css_prov, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+            )
+        except Exception:
+            pass
+
+        win.connect("destroy", Gtk.main_quit)
+        win.show_all()
+        Gtk.main()
+    except Exception as e:
+        print(f"[Dense Task Manager] GUI init failed: {e}")
+        # Fallback to terminal task manager (btop / htop / top)
+        for cmd in [["btop"], ["htop"], ["top"]]:
+            try:
+                subprocess.call(cmd)
+                return
+            except Exception:
+                continue
+
+if __name__ == "__main__":
+    run_gui()

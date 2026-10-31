@@ -91,9 +91,10 @@ def run_gui_bar():
         spacer = Gtk.Box()
         box.pack_start(spacer, True, True, 0)
 
-        # Telemetry Labels
-        lbl_stat = Gtk.Label(label="CPU: 45C | RAM: 2400MB | VOL: 80%")
-        box.pack_start(lbl_stat, False, False, 0)
+        # Telemetry Button (Click to open Dense Task Manager)
+        btn_stat = Gtk.Button(label="CPU: 45C | RAM: 2400MB | VOL: 80%")
+        btn_stat.connect("clicked", lambda b: subprocess.Popen(["dense-taskmanager"]))
+        box.pack_start(btn_stat, False, False, 0)
 
         # Clock
         lbl_clock = Gtk.Label(label=datetime.now().strftime("%a %b %d  %H:%M"))
@@ -106,7 +107,7 @@ def run_gui_bar():
 
         def update_labels():
             t = get_telemetry()
-            lbl_stat.set_text(f"CPU: {t['temp']}C | RAM: {t['mem']}MB | VOL: {t['vol']}%")
+            btn_stat.set_label(f"CPU: {t['temp']}C | RAM: {t['mem']}MB | VOL: {t['vol']}%")
             lbl_clock.set_text(t['clock'])
             return True
 

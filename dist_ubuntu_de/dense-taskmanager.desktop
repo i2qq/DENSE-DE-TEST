@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Dense Task Manager
+Comment=Monitor running processes and system resources in Dense DE
+Exec=dense-taskmanager
+Icon=utilities-system-monitor
+Terminal=false
+Type=Application
+Categories=System;Monitor;
+Keywords=task;manager;process;system;cpu;memory;kill;

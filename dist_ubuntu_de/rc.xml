@@ -22,6 +22,12 @@
     <keybind key="Super+d">
       <action name="Execute" command="fuzzel"/>
     </keybind>
+    <keybind key="Super+Escape">
+      <action name="Execute" command="dense-taskmanager"/>
+    </keybind>
+    <keybind key="Ctrl+Shift+Escape">
+      <action name="Execute" command="dense-taskmanager"/>
+    </keybind>
     <keybind key="Super+e">
       <action name="Execute" command="thunar"/>
     </keybind>
@@ -77,6 +83,7 @@
     <windowRule identifier="alacritty" serverDecoration="yes"/>
     <windowRule identifier="firefox" serverDecoration="yes"/>
     <windowRule identifier="thunar" serverDecoration="yes"/>
+    <windowRule identifier="dense-taskmanager" serverDecoration="yes"/>
     <windowRule identifier="fuzzel" serverDecoration="yes"/>
   </windowRules>
 </labwc_config>

@@ -59,7 +59,7 @@ dock/
 pos=bottom
 autohide=true
 icon_size=44
-pinned_apps=alacritty|firefox|thunar|dense-settings
+pinned_apps=alacritty|firefox|thunar|dense-taskmanager|dense-settings
 \
 
 // --- SECTION 7: WALLPAPER CONFIGURATION ---
@@ -74,7 +74,7 @@ menu/
 Terminal|alacritty
 WebBrowser|firefox
 FileManager|thunar
-TaskManager|alacritty -e btop
+TaskManager|dense-taskmanager
 DenseSettings|dense-settings
 LockScreen|dense-session lock
 LogOut|dense-session logout
@@ -87,6 +87,8 @@ keybinds/
 Super+Return=alacritty
 Super+space=fuzzel
 Super+d=fuzzel
+Super+Escape=dense-taskmanager
+Ctrl+Shift+Escape=dense-taskmanager
 Super+e=thunar
 Super+w=firefox
 Super+q=toplevel_close
@@ -109,6 +111,7 @@ windowrule/
 alacritty|serverDecoration=yes
 firefox|serverDecoration=yes
 thunar|serverDecoration=yes
+dense-taskmanager|floating=yes
 fuzzel|serverDecoration=no
 \
 

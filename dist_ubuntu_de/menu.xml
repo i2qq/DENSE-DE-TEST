@@ -4,7 +4,7 @@
     <item label="Terminal"><action name="Execute" command="alacritty"/></item>
     <item label="WebBrowser"><action name="Execute" command="firefox"/></item>
     <item label="FileManager"><action name="Execute" command="thunar"/></item>
-    <item label="TaskManager"><action name="Execute" command="alacritty -e btop"/></item>
+    <item label="TaskManager"><action name="Execute" command="dense-taskmanager"/></item>
     <item label="DenseSettings"><action name="Execute" command="dense-settings"/></item>
     <item label="LockScreen"><action name="Execute" command="dense-session lock"/></item>
     <item label="LogOut"><action name="Execute" command="dense-session logout"/></item>
