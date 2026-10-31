@@ -1113,13 +1113,15 @@ bool dense_de_export_config(const char *target_dir) {
         fprintf(fp, "  exit 1\n");
         fprintf(fp, "fi\n\n");
         fprintf(fp, "SCRIPT_DIR=\"$(cd \"$(dirname \"${BASH_SOURCE[0]}\")\" && pwd)\"\n\n");
-
+        fprintf(fp, "export DEBIAN_FRONTEND=noninteractive\n\n");
         fprintf(fp, "echo \"[1/6] Installing Wayland stack (labwc, wbg, alacritty, fuzzel, audio)...\"\n");
+        fprintf(fp, "apt-get install -y --no-install-recommends software-properties-common ca-certificates curl 2>/dev/null || true\n");
+        fprintf(fp, "add-apt-repository -y universe 2>/dev/null || true\n");
         fprintf(fp, "apt-get update\n");
         fprintf(fp, "apt-get install -y --no-install-recommends \\\n");
         fprintf(fp, "  gcc make build-essential labwc wbg alacritty fuzzel \\\n");
         fprintf(fp, "  pipewire wireplumber pipewire-pulse pamixer brightnessctl \\\n");
-        fprintf(fp, "  network-manager seatd mako-notifier thunar\n\n");
+        fprintf(fp, "  network-manager seatd mako-notifier thunar python3 libglib2.0-0\n\n");
 
         fprintf(fp, "echo \"[2/6] Executing wipe of GNOME and all other desktop environments...\"\n");
         fprintf(fp, "chmod +x \"$SCRIPT_DIR/wipe_ubuntu_desktops.sh\"\n");

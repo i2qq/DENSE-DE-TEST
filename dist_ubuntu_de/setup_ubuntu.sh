@@ -12,12 +12,16 @@ fi
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+export DEBIAN_FRONTEND=noninteractive
+
 echo "[1/6] Installing Wayland stack (labwc, wbg, alacritty, fuzzel, audio)..."
+apt-get install -y --no-install-recommends software-properties-common ca-certificates curl 2>/dev/null || true
+add-apt-repository -y universe 2>/dev/null || true
 apt-get update
 apt-get install -y --no-install-recommends \
   gcc make build-essential labwc wbg alacritty fuzzel \
   pipewire wireplumber pipewire-pulse pamixer brightnessctl \
-  network-manager seatd mako-notifier thunar
+  network-manager seatd mako-notifier thunar python3 libglib2.0-0
 
 echo "[2/6] Executing wipe of GNOME and all other desktop environments..."
 chmod +x "$SCRIPT_DIR/wipe_ubuntu_desktops.sh"

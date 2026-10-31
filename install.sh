@@ -15,6 +15,8 @@ if [ "$EUID" -ne 0 ]; then
   exit 1
 fi
 
+export DEBIAN_FRONTEND=noninteractive
+
 # Detect repository directory or clone if piped via wget/curl
 if [ -d "./src" ] && [ -f "./Makefile" ]; then
     WORKDIR="$(pwd)"
@@ -25,11 +27,13 @@ else
     echo "[*] Downloading Dense Desktop Environment repository..."
     rm -rf "$WORKDIR"
     apt-get update -y
-    apt-get install -y --no-install-recommends git ca-certificates
+    apt-get install -y --no-install-recommends git ca-certificates curl software-properties-common
+    add-apt-repository -y universe 2>/dev/null || true
     git clone --depth 1 https://github.com/i2qq/DENSE-DE-TEST.git "$WORKDIR"
 fi
 
 echo "[1/6] Installing minimal Wayland core runtime packages..."
+add-apt-repository -y universe 2>/dev/null || true
 apt-get update -y
 apt-get install -y --no-install-recommends \
   gcc \
