@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<labwc_config>
+  <theme>
+    <name>Openbox</name>
+    <cornerRadius>10</cornerRadius>
+    <dropShadows>yes</dropShadows>
+  </theme>
+  <desktops>
+    <number>4</number>
+  </desktops>
+  <snapping>
+    <range>10</range>
+  </snapping>
+  <keyboard>
+    <default/>
+    <keybind key="W-Return">
+      <action name="Execute" command="term"/>
+    </keybind>
+    <keybind key="W-q">
+      <action name="Execute" command="close"/>
+    </keybind>
+  </keyboard>
+  <mouse>
+    <gesture type="swipe3_up"><action name="Execute" command="workspace_switch|next"/></gesture>
+    <gesture type="swipe3_down"><action name="Execute" command="workspace_switch|prev"/></gesture>
+    <gesture type="pinch_in"><action name="Execute" command="overview_toggle"/></gesture>
+  </mouse>
+</labwc_config>

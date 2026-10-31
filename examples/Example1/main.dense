@@ -1,0 +1,37 @@
+// Dense Example 1: Generate and execute a pure Python script
+// Follows Dense rules: Zero decorative punctuation in Dense code logic
+
+// 1. Ensure output directory exists (Q=mkdir)
+Q|output
+
+// 2. Synthesize valid Python code
+// Using Python bytes/chr representation without quotation marks:
+// bytes([72,101,108,108,111]).decode()
+9|output\generated_script.py|import sys
+a|output\generated_script.py|import math
+a|output\generated_script.py|def b2s(b): return bytes(b).decode()
+a|output\generated_script.py|msg=b2s([72,101,108,108,111,32,102,114,111,109,32,68,101,110,115,101,33])
+a|output\generated_script.py|print(msg)
+a|output\generated_script.py|s=sum(range(1,101))
+a|output\generated_script.py|sq=math.isqrt(65536)
+a|output\generated_script.py|print(b2s([83,117,109,32,49,45,49,48,48,58,32]), s)
+a|output\generated_script.py|print(b2s([83,113,114,116,32,54,53,53,51,54,58,32]), sq)
+a|output\generated_script.py|print(b2s([80,121,116,104,111,110,32,86,101,114,115,105,111,110,58,32]), sys.version.split()[0])
+
+// 3. Read back generated Python code (J=read)
+code=J|output\generated_script.py
+K|=== Generated Python Content ===
+K|code
+
+// 4. Branching multiplexer based on file existence
+has_file=code!=&0|&T|&F
+has_file==&T|K|File written successfully!|K|File write failed!
+
+// 5. Execute generated Python script via shell popen (N)
+K|=== Executing Python Script ===
+status=N|python output\generated_script.py
+K|Python Process Exit Status:|status
+
+// 6. Complete status write (9=write)
+9|output\execution.log|SUCCESS
+K|Workflow finished cleanly!

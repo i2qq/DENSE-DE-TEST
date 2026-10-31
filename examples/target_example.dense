@@ -1,0 +1,15 @@
+// Ensure backup directory exists
+Q|Backups
+// Read configuration with fallback to None
+cfg=J|config.json|&0
+// Branch logic based on configuration state
+cfg==&0|K|Using fallback|K|Config loaded
+// Set test x variable
+x=15
+// Output state
+val=x>10|&h|&l
+K|State is:|val
+// Write completion status
+9|backup.log|OK
+// Print completion
+K|Done!

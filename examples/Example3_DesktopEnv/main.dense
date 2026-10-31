@@ -1,0 +1,85 @@
+// Dense Example 3: Full Desktop Environment Architecture for Wayland & Labwc
+// Token-quantized ("IQ1-XXS"), Zero-Whitespace, Zero-Punctuation
+
+// ==========================================
+// 1. Taskbar Panel Building Block
+// ==========================================
+panel/
+pos=&bot
+height=38
+theme=&dark
+exclusive=&T
+layer=&toplayer
+widgets=launcher|pager|tasks|tray|clock|sysstat|quicksettings
+\
+
+// ==========================================
+// 2. Floating Dock Building Block
+// ==========================================
+dock/
+pos=&bot
+size=48
+autohide=&T
+pinned=alacritty|firefox|thunar|vscode
+\
+
+// ==========================================
+// 3. Wallpaper Manager Building Block
+// ==========================================
+wallpaper/
+path=assets\wallpaper_neon.png
+mode=&fill
+\
+
+// ==========================================
+// 4. Labwc Compositor Config Building Block
+// ==========================================
+labwc/
+theme=Openbox
+workspaces=4
+snap=&T
+keybind=W-Return|alacritty
+keybind=W-q|close
+keybind=W-d|launcher
+keybind=W-f|toggle_fullscreen
+keybind=W-m|toggle_maximize
+\
+
+// ==========================================
+// 5. Multiplexer Commands: Runtime DE Control
+// ==========================================
+
+// Query active window list (ti = toplevel_list)
+win_count=ti
+K|Active toplevel windows on Wayland:|win_count
+
+// Focus web browser window (Va = toplevel_focus)
+Va|firefox
+K|Switched focus to Firefox
+
+// Toggle maximize active window (hg = toplevel_maximize)
+hg|active
+
+// Switch workspace to 2 (JF = workspace_switch)
+JF|2
+curr_ws=V7
+K|Current workspace is:|curr_ws
+
+// Dispatch Desktop Notification (If = notify_send)
+If|Dense_OS|Desktop_Environment_Loaded_Cleanly|&norm_urg
+
+// Display Volume OSD overlay (d9 = osd_show)
+d9|volume|85
+
+// Signal Compositor Reload (PQ = labwc_reload)
+PQ
+
+// ==========================================
+// 6. Export Full Bootable Labwc DE Config
+// ==========================================
+// 0j = de_export
+0j|dist_labwc_de
+
+// Query overall DE status (Xs = de_status)
+status=Xs
+K|DE initialization finished cleanly! Total panels active:|status

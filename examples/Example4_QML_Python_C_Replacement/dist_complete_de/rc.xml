@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<labwc_config>
+  <theme>
+    <name>Openbox</name>
+    <cornerRadius>12</cornerRadius>
+    <dropShadows>yes</dropShadows>
+  </theme>
+  <desktops>
+    <number>4</number>
+  </desktops>
+  <snapping>
+    <range>10</range>
+  </snapping>
+  <keyboard>
+    <default/>
+    <keybind key="Super+Return">
+      <action name="Execute" command="alacritty"/>
+    </keybind>
+    <keybind key="Super+Q">
+      <action name="Execute" command="toplevel_close"/>
+    </keybind>
+    <keybind key="Super+F">
+      <action name="Execute" command="toplevel_fullscreen"/>
+    </keybind>
+    <keybind key="Super+1">
+      <action name="Execute" command="workspace_switch|1"/>
+    </keybind>
+    <keybind key="Super+2">
+      <action name="Execute" command="workspace_switch|2"/>
+    </keybind>
+    <keybind key="Super+3">
+      <action name="Execute" command="workspace_switch|3"/>
+    </keybind>
+  </keyboard>
+  <mouse>
+    <gesture type="swipe3_up"><action name="Execute" command="workspace_switch|next"/></gesture>
+    <gesture type="swipe3_down"><action name="Execute" command="workspace_switch|prev"/></gesture>
+    <gesture type="pinch_in"><action name="Execute" command="overview_toggle"/></gesture>
+    <gesture type="pinch_out"><action name="Execute" command="desktop_show"/></gesture>
+  </mouse>
+  <windowRules>
+    <windowRule identifier="firefox" serverDecoration="yes"/>
+    <windowRule identifier="alacritty" serverDecoration="yes"/>
+    <windowRule identifier="thunar" serverDecoration="yes"/>
+  </windowRules>
+</labwc_config>

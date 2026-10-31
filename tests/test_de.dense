@@ -1,0 +1,66 @@
+// Dense Automated Desktop Environment & Wayland Test Suite
+// Verifies all DE building blocks, window management, and compositor controls
+
+// 1. Taskbar Panel Block Declaration
+panel/
+pos=&bot
+height=40
+theme=&dark
+exclusive=&T
+widgets=launcher|pager|tasks|tray|clock
+\
+
+// 2. Dock Block Declaration
+dock/
+pos=&bot
+size=48
+autohide=&T
+pinned=term|browser|files
+\
+
+// 3. Wallpaper Block Declaration
+wallpaper/
+path=bg.png
+mode=&fill
+\
+
+// 4. Labwc Block Declaration
+labwc/
+theme=Openbox
+workspaces=4
+snap=&T
+keybind=W-Return|term
+keybind=W-q|close
+\
+
+// 5. Test Window / Toplevel controls
+active_wins=ti
+K|Initial active windows:|active_wins
+
+Va|firefox
+K|Focused window
+
+hg|active
+K|Maximized window
+
+cC|active
+K|Minimized window
+
+i7|active
+K|Fullscreen toggled
+
+// 6. Test Workspace switching
+JF|3
+ws_count=V7
+K|Total workspaces:|ws_count
+
+// 7. Test Notifications & OSD
+If|Test_Notification|Testing_Dense_DE_Subsystem|&norm_urg
+d9|volume|70
+d9|brightness|90
+
+// 8. Test Labwc IPC & Config Export
+PQ
+0j|dist_test_de
+status=Xs
+K|DE Test Completed Successfully! Active panels:|status

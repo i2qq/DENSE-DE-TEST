@@ -1,0 +1,139 @@
+#!/usr/bin/env python3
+"""
+Dense Wayland Native Status Bar (dense-bar)
+Lightweight layer-shell desktop status bar orchestrated by Dense.
+"""
+import sys
+import os
+import time
+import subprocess
+import threading
+from datetime import datetime
+
+def get_telemetry():
+    # Read memory info
+    mem_used_mb = 0
+    try:
+        with open("/proc/meminfo") as f:
+            lines = f.readlines()
+            total, free, avail = 0, 0, 0
+            for l in lines:
+                if l.startswith("MemTotal:"): total = int(l.split()[1])
+                elif l.startswith("MemAvailable:"): avail = int(l.split()[1])
+            mem_used_mb = (total - avail) // 1024
+    except Exception:
+        mem_used_mb = 2400
+
+    # Read CPU temperature
+    cpu_temp = 45
+    try:
+        for tpath in ["/sys/class/thermal/thermal_zone0/temp", "/sys/class/hwmon/hwmon0/temp1_input"]:
+            if os.path.exists(tpath):
+                with open(tpath) as f:
+                    cpu_temp = int(f.read().strip()) // 1000
+                break
+    except Exception:
+        cpu_temp = 45
+
+    # Volume
+    vol = 80
+    try:
+        out = subprocess.check_output(["pamixer", "--get-volume"], stderr=subprocess.DEVNULL).decode().strip()
+        vol = int(out)
+    except Exception:
+        vol = 80
+
+    # Clock
+    now_str = datetime.now().strftime("%a %b %d  %H:%M")
+    return {
+        "mem": mem_used_mb,
+        "temp": cpu_temp,
+        "vol": vol,
+        "clock": now_str
+    }
+
+def run_gui_bar():
+    try:
+        import gi
+        gi.require_version('Gtk', '3.0')
+        gi.require_version('GtkLayerShell', '0.1')
+        from gi.repository import Gtk, GLib, GtkLayerShell
+
+        win = Gtk.Window()
+        win.set_title("Dense Top Bar")
+        GtkLayerShell.init_for_window(win)
+        GtkLayerShell.set_layer(win, GtkLayerShell.Layer.TOP)
+        GtkLayerShell.auto_exclusive_zone_enable(win)
+        GtkLayerShell.set_anchor(win, GtkLayerShell.Edge.TOP, True)
+        GtkLayerShell.set_anchor(win, GtkLayerShell.Edge.LEFT, True)
+        GtkLayerShell.set_anchor(win, GtkLayerShell.Edge.RIGHT, True)
+
+        box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=12)
+        box.set_margin_start(16)
+        box.set_margin_end(16)
+        box.set_margin_top(4)
+        box.set_margin_bottom(4)
+
+        # App Launcher Button
+        btn_launcher = Gtk.Button(label="  DENSE  ")
+        btn_launcher.connect("clicked", lambda b: subprocess.Popen(["fuzzel"]))
+        box.pack_start(btn_launcher, False, False, 0)
+
+        # Workspaces
+        for ws in range(1, 5):
+            b_ws = Gtk.Button(label=f" {ws} ")
+            def make_ws_cb(num):
+                return lambda b: subprocess.Popen(["labwc", "--switch-desktop", str(num)])
+            b_ws.connect("clicked", make_ws_cb(ws))
+            box.pack_start(b_ws, False, False, 0)
+
+        # Spacer
+        spacer = Gtk.Box()
+        box.pack_start(spacer, True, True, 0)
+
+        # Telemetry Labels
+        lbl_stat = Gtk.Label(label="CPU: 45C | RAM: 2400MB | VOL: 80%")
+        box.pack_start(lbl_stat, False, False, 0)
+
+        # Clock
+        lbl_clock = Gtk.Label(label=datetime.now().strftime("%a %b %d  %H:%M"))
+        box.pack_start(lbl_clock, False, False, 0)
+
+        # Power Menu Button
+        btn_power = Gtk.Button(label=" Power ")
+        btn_power.connect("clicked", lambda b: subprocess.Popen(["dense-session", "poweroff"]))
+        box.pack_start(btn_power, False, False, 0)
+
+        def update_labels():
+            t = get_telemetry()
+            lbl_stat.set_text(f"CPU: {t['temp']}C | RAM: {t['mem']}MB | VOL: {t['vol']}%")
+            lbl_clock.set_text(t['clock'])
+            return True
+
+        GLib.timeout_add_seconds(1, update_labels)
+
+        # Apply CSS styling if exists
+        css_path = "/etc/dense/style.css"
+        if not os.path.exists(css_path):
+            css_path = os.path.expanduser("~/.config/dense/style.css")
+        if os.path.exists(css_path):
+            css_prov = Gtk.CssProvider()
+            css_prov.load_from_path(css_path)
+            Gtk.StyleContext.add_provider_for_screen(
+                win.get_screen(), css_prov, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+            )
+
+        win.add(box)
+        win.show_all()
+        Gtk.main()
+    except Exception as e:
+        # Fallback console monitor
+        print(f"[Dense Bar] Native Layer-Shell fallback: {e}")
+        while True:
+            t = get_telemetry()
+            sys.stdout.write(f"\r[Dense Top Bar] {t['clock']} | CPU:{t['temp']}C | RAM:{t['mem']}MB | VOL:{t['vol']}%")
+            sys.stdout.flush()
+            time.sleep(2)
+
+if __name__ == "__main__":
+    run_gui_bar()

@@ -1,0 +1,12 @@
+//denseproj
+encoding=base8
+scratchpad /
+| [Optional: Multi-line planning or model reasoning block.
+| The interpreter parses past this block and ignores everything inside it.]
+\
+
+global | imports /
+// Format: module - ALIAS (where '-' means 'as')
+pillow - PID
+onnx - ONNX
+\

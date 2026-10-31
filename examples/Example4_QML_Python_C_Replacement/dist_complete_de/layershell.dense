@@ -1,0 +1,7 @@
+// Dense Wayland Layer Shell Declarations
+layershell/
+namespace=dense_status_bar
+layer=2
+anchor=0xd
+exclusive_zone=36
+\

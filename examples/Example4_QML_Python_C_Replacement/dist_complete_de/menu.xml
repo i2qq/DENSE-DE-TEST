@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<openbox_menu>
+  <menu id="root-menu" label="Dense DE">
+    <item label="Terminal"><action name="Execute" command="alacritty"/></item>
+    <item label="WebBrowser"><action name="Execute" command="firefox"/></item>
+    <item label="FileManager"><action name="Execute" command="thunar"/></item>
+    <item label="Settings"><action name="Execute" command="dense_settings"/></item>
+    <separator/>
+    <item label="Lock Screen"><action name="Execute" command="dense lock.dense"/></item>
+    <item label="Exit Labwc"><action name="Exit"/></item>
+  </menu>
+</openbox_menu>

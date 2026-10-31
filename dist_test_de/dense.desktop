@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=Dense Desktop
+Comment=Dense-Orchestrated Modern Wayland Desktop Environment
+Exec=/usr/local/bin/dense-session
+TryExec=/usr/local/bin/dense-session
+Type=Application
+DesktopNames=Dense;labwc

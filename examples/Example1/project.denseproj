@@ -1,0 +1,15 @@
+//denseproj
+encoding=base8
+scratchpad /
+| Planning block for Example1:
+| 1. Create output directory for generated Python artifact.
+| 2. Write a Python script generator without quotes or punctuation soup.
+| 3. Read back and verify the file content.
+| 4. Conditionally execute and log the status.
+\
+
+global | imports /
+// Global module imports and aliases
+python - PY
+os - OS
+\

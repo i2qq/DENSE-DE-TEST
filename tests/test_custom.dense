@@ -1,0 +1,10 @@
+// Test custom table mappings
+K|Custom mode test
+val=&g4
+K|Val is:|val
+lowval=&377
+K|Low val is:|lowval
+9|custom_out.txt|custom_success
+readback=J|custom_out.txt
+K|Readback is:|readback
+7|custom_out.txt

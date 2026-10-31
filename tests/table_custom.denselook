@@ -1,0 +1,13 @@
+table /
+style | custom
+// Format: <code> | <action>
+K | echo
+7 | del
+J | read
+9 | write
+&T | true
+&F | false
+&0 | none
+&g4 | high
+&377 | low
+\

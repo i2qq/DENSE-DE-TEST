@@ -1,0 +1,18 @@
+//denseproj
+encoding=base8
+scratchpad /
+| Dense Example 3: Wayland / Labwc Desktop Environment Construction
+| Demonstrating first-class DE Building Blocks:
+| 1. Taskbar Panel Block (widgets: launcher, pager, tasks, tray, clock, sysstat, quicksettings)
+| 2. Floating App Dock Block (autohide, pinned applications)
+| 3. Wallpaper Manager Block (layer-shell background, fill mode)
+| 4. Compositor Block (Labwc keybindings, window rules, snapping, workspace config)
+| 5. Window / Foreign Toplevel Management (focus, minimize, maximize, close)
+| 6. Notifications & OSD (volume, brightness, urgent toasts)
+| 7. Exporting production-ready Labwc + Wayland environment configuration
+\
+
+global | imports /
+labwc - LWC
+wayland - WL
+\

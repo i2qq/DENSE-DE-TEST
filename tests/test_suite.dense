@@ -1,0 +1,32 @@
+// Test 1: Variable assignment and arithmetic/logical conditions
+a=10
+b=20
+K|Testing variables: a=|a|b=|b
+
+// Test 2: Ternary multiplexer
+cond_res=a<b|&T|&F
+K|Condition a<b is:|cond_res
+
+// Test 3: String and vocab multiplexer
+is_high=a>=10|&g4|&377
+K|Threshold check is:|is_high
+
+// Test 4: File I/O (9=write, J=read, 7=del)
+9|test_io.txt|DenseZeroPunctuationWorks
+file_content=J|test_io.txt
+K|Read from test_io.txt:|file_content
+7|test_io.txt
+
+// Test 5: Safe fallback execution
+fallback_test=J|non_existent_file.txt|&0
+K|Fallback result:|fallback_test
+
+// Test 6: Loop (v=range)
+K|Starting loop test:
+v|i|3|K|LoopIndex:
+
+// Test 7: Imported module alias resolution
+K|Imported PID maps to:|PID
+K|Imported ONNX maps to:|ONNX
+
+K|ALL TESTS PASSED SUCCESSFULLY!

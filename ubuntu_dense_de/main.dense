@@ -1,0 +1,161 @@
+// =========================================================================
+// Dense Language Simple Desktop Environment for Ubuntu
+// Replaces GNOME and All Other Desktop Environments with Pure Dense
+// Zero Whitespace, Zero Decorative Punctuation Soup, Static Base64 Dispatch
+// =========================================================================
+
+// --- SECTION 1: UBUNTU SESSION CONFIGURATION ---
+session/
+name=Dense Desktop
+comment=Simple and ultra-fast Wayland desktop environment coded in Dense
+compositor=labwc
+exec=/usr/local/bin/dense-session
+desktop_names=Dense;labwc
+\
+
+// --- SECTION 2: SYSTEM ENVIRONMENT WIPING ---
+// Purges GNOME, KDE, XFCE, MATE, Cinnamon, LXQt/LXDE and cleans session trees
+wipe/
+target=all
+distro=ubuntu
+purge_configs=true
+dry_run=false
+\
+
+// --- SECTION 3: DESKTOP THEME & VISUAL STYLE ---
+style/
+bg=#13141f
+fg=#e2e8f0
+accent=#6366f1
+border=#282a36
+radius=12
+font=JetBrainsMono
+size=11
+shadow=true
+blur=true
+\
+
+// --- SECTION 4: COMPOSITOR HARDWARE ENGINE ---
+compositor/
+corner_radius=12
+drop_shadows=true
+animations=true
+decorations=server
+vsync=true
+tearing=false
+\
+
+// --- SECTION 5: TOP STATUS BAR PANEL ---
+panel/
+pos=top
+height=34
+theme=dark
+exclusive=true
+widgets=launcher|pager|tasks|spacer|sysstat|audio|network|battery|clock|quicksettings
+\
+
+// --- SECTION 6: BOTTOM APPLICATION DOCK ---
+dock/
+pos=bottom
+autohide=true
+icon_size=44
+pinned_apps=alacritty|firefox|thunar|dense-settings
+\
+
+// --- SECTION 7: WALLPAPER CONFIGURATION ---
+wallpaper/
+path=/etc/dense/wallpaper.png
+mode=fill
+color=#0f1017
+\
+
+// --- SECTION 8: DESKTOP CONTEXT MENU ---
+menu/
+Terminal|alacritty
+WebBrowser|firefox
+FileManager|thunar
+TaskManager|alacritty -e btop
+DenseSettings|dense-settings
+LockScreen|dense-session lock
+LogOut|dense-session logout
+RebootSystem|dense-session reboot
+PowerOff|dense-session poweroff
+\
+
+// --- SECTION 9: HARDWARE KEYCHORDS & SHORTCUTS ---
+keybinds/
+Super+Return=alacritty
+Super+space=fuzzel
+Super+d=fuzzel
+Super+e=thunar
+Super+w=firefox
+Super+q=toplevel_close
+Super+f=toplevel_fullscreen
+Super+1=workspace_switch|1
+Super+2=workspace_switch|2
+Super+3=workspace_switch|3
+Super+4=workspace_switch|4
+Super+l=session_lock
+Super+Shift+q=session_logout
+XF86AudioRaiseVolume=pamixer -i 5
+XF86AudioLowerVolume=pamixer -d 5
+XF86AudioMute=pamixer -t
+XF86MonBrightnessUp=brightnessctl set +5%
+XF86MonBrightnessDown=brightnessctl set 5%-
+\
+
+// --- SECTION 10: COMPOSITOR WINDOW RULES ---
+windowrule/
+alacritty|serverDecoration=yes
+firefox|serverDecoration=yes
+thunar|serverDecoration=yes
+fuzzel|serverDecoration=no
+\
+
+// --- SECTION 11: AUTOSTART SYSTEM SERVICES ---
+autostart/
+pipewire &
+wireplumber &
+wbg /etc/dense/wallpaper.png &
+mako &
+dense-bar &
+\
+
+// --- SECTION 12: DEPLOYMENT SUITE EXPORT ---
+// Exports complete Labwc configs, Wayland session desktop file,
+// session launcher, wiping scripts, and Ubuntu installer suite
+deploy/
+target=dist_ubuntu_de
+distro=ubuntu
+autologin=true
+\
+
+// --- SECTION 13: REALTIME TELEMETRY VERIFICATION ---
+cpu=iX
+mem=4Q
+disk=eK
+K|---_Dense_System_Telemetry_---
+K|CPU_Temperature:
+K|cpu
+K|Memory_Usage_MB:
+K|mem
+K|Disk_Free_GB:
+K|disk
+
+// Audio volume setup (Base64 fK)
+vol=volume|80
+K|Volume_Set_To:
+K|vol
+
+// Network Wi-Fi status check
+wifi=net_status
+K|Active_Network:
+K|wifi
+
+// Execute GNOME & Desktop Environment Wipe Dispatch (Base64 Te)
+Te|all|&T|&F
+
+// Execute Desktop Environment Deployment Suite (Base64 QI)
+QI|dist_ubuntu_de
+
+K|Dense_Desktop_Environment_Successfully_Generated_For_Ubuntu!

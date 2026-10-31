@@ -1,0 +1,12 @@
+//denseproj
+encoding=base8
+scratchpad /
+| Dense Example 2: Interactive Tkinter Unit Converter
+| Built 100% natively in Dense using zero whitespace and zero decorative punctuation.
+| Direct C-level bridge into Python's tkinter module without generating or executing any .py files.
+\
+
+global | imports /
+// Module aliases mapped to Base64/Identifiers
+tkinter - TK
+\

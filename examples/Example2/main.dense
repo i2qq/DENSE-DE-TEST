@@ -1,0 +1,43 @@
+// Dense Example 2: Interactive Tkinter Unit Converter
+// ZERO python files. Zero decorative punctuation. Zero whitespace.
+// Runs natively via Dense C-bridge to save tokens for LLM generation.
+
+// 1. Initialize Root Window
+win=TK|Tk
+win|title|DenseUnitConverter
+win|geometry|400x320
+win|configure|bg=#1e1e1e
+
+// 2. Add Header Label
+hdr=TK|Label|win|text=DENSE_UNIT_CONVERTER|fg=#00e676|bg=#1e1e1e|font=Helvetica13bold
+hdr|pack|pady=12
+
+// 3. Subtitle
+sub=TK|Label|win|text=ZeroPythonFiles_IQ1XXS_TokenQuantized|fg=#888888|bg=#1e1e1e
+sub|pack|pady=2
+
+// 4. Input Prompt & Entry Box
+prompt=TK|Label|win|text=Enter_Kilometers:|fg=#ffffff|bg=#1e1e1e
+prompt|pack|pady=6
+entry=TK|Entry|win|width=24|justify=center
+entry|pack|pady=4
+entry|insert|0|100
+
+// 5. Result Display Label
+res=TK|Label|win|text=Result:62.14Miles|fg=#00bcd4|bg=#1e1e1e|font=Helvetica11bold
+res|pack|pady=14
+
+// 6. Action & Exit Buttons
+btn=TK|Button|win|text=Convert_Kilometers_To_Miles|bg=#00e676|fg=#000000|width=26
+btn|pack|pady=8
+
+exit_btn=TK|Button|win|text=Exit_Application|bg=#333333|fg=#ffffff|width=26|command=win.destroy
+exit_btn|pack|pady=6
+
+// 7. Echo confirmation in Dense CLI
+K|Interactive Tkinter Unit Converter GUI running natively via Dense...
+K|Zero .py files created on disk. 100% token-quantized Dense instructions.
+
+// 8. Start GUI event loop
+win|mainloop
+K|GUI closed cleanly!

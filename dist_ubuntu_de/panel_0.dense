@@ -1,0 +1,8 @@
+// Dense Panel Definition
+panel/
+pos=0
+height=34
+theme=0
+exclusive=&T
+widgets=launcher|pager|tasks|spacer|sysstat|audio|network|battery|clock|quicksettings
+\

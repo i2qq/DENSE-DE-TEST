@@ -1,0 +1,28 @@
+#!/bin/bash
+# =========================================================================
+# Dense Wayland Session Launcher
+# Orchestrated and configured in Dense Language
+# =========================================================================
+
+export XDG_CURRENT_DESKTOP="Dense:labwc"
+export XDG_SESSION_DESKTOP="Dense"
+export XDG_SESSION_TYPE="wayland"
+export MOZ_ENABLE_WAYLAND=1
+export GDK_BACKEND="wayland,x11"
+export QT_QPA_PLATFORM="wayland;xcb"
+export SDL_VIDEODRIVER="wayland"
+export CLUTTER_BACKEND="wayland"
+
+if [ -z "$XDG_RUNTIME_DIR" ]; then
+    export XDG_RUNTIME_DIR="/run/user/$(id -u)"
+fi
+
+DENSE_CONF_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/dense"
+mkdir -p "$DENSE_CONF_DIR"
+
+# If user config is empty, seed from /etc/dense
+if [ ! -f "$DENSE_CONF_DIR/rc.xml" ] && [ -d "/etc/dense" ]; then
+    cp -r /etc/dense/* "$DENSE_CONF_DIR/" 2>/dev/null || true
+fi
+
+exec labwc -C "$DENSE_CONF_DIR"

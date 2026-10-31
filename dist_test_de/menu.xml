@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<openbox_menu>
+  <menu id="root-menu" label="Dense DE">
+    <separator/>
+    <item label="Lock Screen"><action name="Execute" command="dense lock.dense"/></item>
+    <item label="Exit Labwc"><action name="Exit"/></item>
+  </menu>
+</openbox_menu>

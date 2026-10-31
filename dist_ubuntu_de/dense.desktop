@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=Dense Desktop
+Comment=Simple and ultra-fast Wayland desktop environment coded in Dense
+Exec=/usr/local/bin/dense-session
+TryExec=/usr/local/bin/dense-session
+Type=Application
+DesktopNames=Dense;labwc

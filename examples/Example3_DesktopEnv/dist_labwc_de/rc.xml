@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<labwc_config>
+  <theme>
+    <name>Openbox</name>
+    <cornerRadius>8</cornerRadius>
+  </theme>
+  <desktops>
+    <number>4</number>
+  </desktops>
+  <snapping>
+    <range>10</range>
+  </snapping>
+  <keyboard>
+    <default/>
+    <keybind key="W-Return">
+      <action name="Execute" command="alacritty"/>
+    </keybind>
+    <keybind key="W-q">
+      <action name="Execute" command="close"/>
+    </keybind>
+    <keybind key="W-d">
+      <action name="Execute" command="launcher"/>
+    </keybind>
+    <keybind key="W-f">
+      <action name="Execute" command="toggle_fullscreen"/>
+    </keybind>
+    <keybind key="W-m">
+      <action name="Execute" command="toggle_maximize"/>
+    </keybind>
+  </keyboard>
+</labwc_config>
